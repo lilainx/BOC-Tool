@@ -7,11 +7,15 @@ module.exports = async (env, options) => {
   const dev = options.mode === "development";
 
   // Trusted HTTPS cert for localhost so Excel on the web can load add-in files.
+  // Only needed for the local dev server — never in a production build (e.g. the
+  // Cloudflare Pages build runs `npm run build` with no certs and no interactivity).
   let httpsOptions = {};
-  try {
-    httpsOptions = await devCerts.getHttpsServerOptions();
-  } catch (e) {
-    // Certs not installed yet — `npm run dev:certs` will create them.
+  if (dev) {
+    try {
+      httpsOptions = await devCerts.getHttpsServerOptions();
+    } catch (e) {
+      // Certs not installed yet — `npm run dev:certs` will create them.
+    }
   }
 
   return {
