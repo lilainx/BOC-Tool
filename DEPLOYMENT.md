@@ -17,10 +17,29 @@ team. Loop them in early.
 ## Part 1 — Host the files
 
 The add-in is a static site (HTML/JS/CSS) plus a JSON manifest, so any static
-HTTPS host works. **Azure Static Web Apps** is the natural fit (free tier is
-plenty, integrates with Microsoft 365, and supports GitHub-based deploys).
+HTTPS host works.
 
-### Option A — Azure Static Web Apps (recommended)
+### Option A — GitHub Pages (recommended: free, no extra account)
+
+Best when the code lives on GitHub and you want zero extra services. The repo
+already includes the CI workflow at `.github/workflows/deploy-pages.yml`, which
+builds and publishes `dist/` automatically.
+
+1. Create a GitHub repo and push this project to it (see `GITHUB_SETUP` steps below).
+2. In the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. Push to `main` (or click **Run workflow** on the Actions tab). The workflow
+   builds and deploys.
+4. Your URL will be **`https://<your-username>.github.io/<repo-name>/`**.
+   The add-in files live under that path (e.g. `.../<repo-name>/taskpane.html`).
+
+> ⚠️ **Public vs private**: GitHub Pages is free on **public** repos. This add-in
+> contains no secrets (it's a thin client over a public government API), so a
+> public repo is low-risk — but confirm that's acceptable for company code. If it
+> must stay private, either use a GitHub Team/Enterprise plan (private Pages) or
+> switch to **Cloudflare Pages** / **Netlify** (both free and support private
+> repos — connect the repo, build command `npm run build`, output dir `dist`).
+
+### Option B — Azure Static Web Apps
 
 Prereqs: an Azure account (GeoComply almost certainly has one — ask IT), and
 this project pushed to a GitHub repo.
@@ -63,7 +82,23 @@ npx office-addin-manifest validate manifest.prod.xml
 
 ---
 
-## Part 3 — Distribute to the team
+## Part 3 — Get it to your user(s)
+
+### Just one (or a few) users — no admin needed
+
+For a single accountant, skip the M365 Admin Center entirely. That person
+sideloads the production manifest themselves, exactly like during development:
+
+1. Send them `manifest.prod.xml` (the one pointing at your hosted URL).
+2. They open **Excel on the web** → **Insert → Add-ins → Upload My Add-in** →
+   browse to `manifest.prod.xml` → **Upload**.
+3. Because the files are hosted (not on localhost), it keeps working with no dev
+   server and nothing running on anyone's machine.
+
+That's the fastest way to get your first user going. Move to org distribution
+below once you want it to appear automatically for the whole team.
+
+### Whole team — via M365 admin
 
 Hand `manifest.prod.xml` to your M365 admin (or do it yourself if you have rights):
 
