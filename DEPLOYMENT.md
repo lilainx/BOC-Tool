@@ -19,25 +19,28 @@ team. Loop them in early.
 The add-in is a static site (HTML/JS/CSS) plus a JSON manifest, so any static
 HTTPS host works.
 
-### Option A — GitHub Pages (recommended: free, no extra account)
+### Option A — Cloudflare Pages (recommended: free, private repos OK)
 
-Best when the code lives on GitHub and you want zero extra services. The repo
-already includes the CI workflow at `.github/workflows/deploy-pages.yml`, which
-builds and publishes `dist/` automatically.
+Free, works with **private** GitHub repos, and serves from the root domain (no
+sub-path), which keeps the manifest simple. Cloudflare builds the project itself
+from your repo — no GitHub Actions workflow or secrets to manage.
 
-1. Create a GitHub repo and push this project to it (see `GITHUB_SETUP` steps below).
-2. In the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Push to `main` (or click **Run workflow** on the Actions tab). The workflow
-   builds and deploys.
-4. Your URL will be **`https://<your-username>.github.io/<repo-name>/`**.
-   The add-in files live under that path (e.g. `.../<repo-name>/taskpane.html`).
+Prereq: the project pushed to a GitHub repo (private is fine) and a free
+Cloudflare account (sign up at https://dash.cloudflare.com — no card required).
 
-> ⚠️ **Public vs private**: GitHub Pages is free on **public** repos. This add-in
-> contains no secrets (it's a thin client over a public government API), so a
-> public repo is low-risk — but confirm that's acceptable for company code. If it
-> must stay private, either use a GitHub Team/Enterprise plan (private Pages) or
-> switch to **Cloudflare Pages** / **Netlify** (both free and support private
-> repos — connect the repo, build command `npm run build`, output dir `dist`).
+1. In the Cloudflare dashboard: **Workers & Pages → Create → Pages → Connect to Git**.
+2. Authorize Cloudflare to access your GitHub account and pick the repo.
+3. Set the build configuration:
+   - **Framework preset**: None
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dist`
+4. **Save and Deploy.** Cloudflare builds and gives you a URL like
+   **`https://boc-tool.pages.dev`** (files live at the root, e.g.
+   `https://boc-tool.pages.dev/taskpane.html`).
+5. Every push to the repo redeploys automatically.
+
+> No public/private worry here — Cloudflare Pages is free either way, so keep the
+> repo private if that's your preference for company code.
 
 ### Option B — Azure Static Web Apps
 
