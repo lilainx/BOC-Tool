@@ -1,0 +1,67 @@
+{
+  "functions": [
+    {
+      "id": "RATE",
+      "name": "RATE",
+      "description": "Returns the CAD exchange rate for a currency from the Bank of Canada. Rate = CAD per 1 unit of the given currency.",
+      "parameters": [
+        { "name": "currency", "description": "Currency code (e.g. \"USD\", \"EUR\", \"GBP\")", "type": "string" },
+        { "name": "date", "description": "Optional date in YYYY-MM-DD format. Omit for the latest available rate.", "type": "string", "optional": true }
+      ],
+      "result": { "type": "number", "dimensionality": "scalar" }
+    },
+    {
+      "id": "MONTHLY_AVG",
+      "name": "MONTHLY_AVG",
+      "description": "Returns the monthly average CAD exchange rate from the Bank of Canada.",
+      "parameters": [
+        { "name": "currency", "description": "Currency code (e.g. \"USD\")", "type": "string" },
+        { "name": "year", "description": "Four-digit year (e.g. 2024)", "type": "number" },
+        { "name": "month", "description": "Month number 1–12", "type": "number" }
+      ],
+      "result": { "type": "number", "dimensionality": "scalar" }
+    },
+    {
+      "id": "ANNUAL_AVG",
+      "name": "ANNUAL_AVG",
+      "description": "Returns the annual average CAD exchange rate from the Bank of Canada.",
+      "parameters": [
+        { "name": "currency", "description": "Currency code (e.g. \"USD\")", "type": "string" },
+        { "name": "year", "description": "Four-digit year (e.g. 2024)", "type": "number" }
+      ],
+      "result": { "type": "number", "dimensionality": "scalar" }
+    },
+    {
+      "id": "TO_CAD",
+      "name": "TO_CAD",
+      "description": "Converts a foreign currency amount to CAD using the Bank of Canada rate.",
+      "parameters": [
+        { "name": "amount", "description": "Amount in the foreign currency", "type": "number" },
+        { "name": "currency", "description": "Currency code (e.g. \"USD\")", "type": "string" },
+        { "name": "date", "description": "Optional date in YYYY-MM-DD format. Omit for the latest rate.", "type": "string", "optional": true }
+      ],
+      "result": { "type": "number", "dimensionality": "scalar" }
+    },
+    {
+      "id": "FROM_CAD",
+      "name": "FROM_CAD",
+      "description": "Converts a CAD amount to a foreign currency using the Bank of Canada rate.",
+      "parameters": [
+        { "name": "amount", "description": "Amount in CAD", "type": "number" },
+        { "name": "currency", "description": "Currency code (e.g. \"USD\")", "type": "string" },
+        { "name": "date", "description": "Optional date in YYYY-MM-DD format. Omit for the latest rate.", "type": "string", "optional": true }
+      ],
+      "result": { "type": "number", "dimensionality": "scalar" }
+    },
+    {
+      "id": "RATE_DATE",
+      "name": "RATE_DATE",
+      "description": "Returns the actual date of the rate used. Useful when the requested date falls on a weekend or holiday.",
+      "parameters": [
+        { "name": "currency", "description": "Currency code (e.g. \"USD\")", "type": "string" },
+        { "name": "date", "description": "Optional date in YYYY-MM-DD format. Omit for the latest rate.", "type": "string", "optional": true }
+      ],
+      "result": { "type": "string", "dimensionality": "scalar" }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Generated production manifest (created by `npm run make:prod-manifest <url>`)
+manifest.prod.xml
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Office add-in dev certs (machine-specific, never commit)
+*.crt
+*.key
+*.pem
+
+# Local Claude/agent settings & runtime locks
+.claude/settings.local.json
+.claude/*.lock
+
+# Environment / secrets
+.env
+.env.*

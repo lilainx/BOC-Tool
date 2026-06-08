@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOC Exchange Rates</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header>
+      <div class="header-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <div>
+        <h1>BOC Exchange Rates</h1>
+        <p class="subtitle">Bank of Canada — Official Rates</p>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="lookup">Lookup</button>
+      <button class="tab" data-tab="convert">Convert</button>
+      <button class="tab" data-tab="trend">Trend</button>
+      <button class="tab" data-tab="formulas">Formulas</button>
+    </nav>
+
+    <!-- ── Tab: Lookup ── -->
+    <section id="tab-lookup" class="tab-content active">
+      <div class="form-group">
+        <label for="lookup-currency">Currency</label>
+        <select id="lookup-currency"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Rate Type</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="lookup-type" value="latest" checked /> Latest
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="lookup-type" value="daily" /> Specific Date
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="lookup-type" value="monthly" /> Monthly Avg
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="lookup-type" value="annual" /> Annual Avg
+          </label>
+        </div>
+      </div>
+
+      <div id="lookup-date-row" class="form-group hidden">
+        <label for="lookup-date">Date</label>
+        <input type="date" id="lookup-date" />
+      </div>
+
+      <div id="lookup-monthly-row" class="form-group hidden">
+        <div class="two-col">
+          <div>
+            <label for="lookup-year">Year</label>
+            <input type="number" id="lookup-year" min="1990" max="2100" placeholder="2024" />
+          </div>
+          <div>
+            <label for="lookup-month">Month</label>
+            <select id="lookup-month">
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="11">November</option><option value="12">December</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="lookup-annual-row" class="form-group hidden">
+        <label for="lookup-annual-year">Year</label>
+        <input type="number" id="lookup-annual-year" min="1990" max="2100" placeholder="2024" />
+      </div>
+
+      <button id="lookup-btn" class="btn-primary">Get Rate</button>
+
+      <div id="lookup-result" class="result-card hidden">
+        <div class="result-rate" id="lookup-rate-display"></div>
+        <div class="result-meta" id="lookup-meta-display"></div>
+        <button id="lookup-insert-btn" class="btn-secondary">Insert into Cell</button>
+      </div>
+
+      <div id="lookup-error" class="error-msg hidden"></div>
+    </section>
+
+    <!-- ── Tab: Convert ── -->
+    <section id="tab-convert" class="tab-content">
+      <div class="form-group">
+        <label for="convert-amount">Amount</label>
+        <input type="number" id="convert-amount" placeholder="1000.00" step="0.01" />
+      </div>
+
+      <div class="convert-direction">
+        <div class="form-group flex-1">
+          <label for="convert-from">From</label>
+          <select id="convert-from"></select>
+        </div>
+        <button id="convert-swap-btn" class="swap-btn" title="Swap currencies">⇄</button>
+        <div class="form-group flex-1">
+          <label for="convert-to">To</label>
+          <select id="convert-to"></select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="convert-date">Date <span class="hint">(leave blank for latest)</span></label>
+        <input type="date" id="convert-date" />
+      </div>
+
+      <button id="convert-btn" class="btn-primary">Convert</button>
+
+      <div id="convert-result" class="result-card hidden">
+        <div class="result-rate" id="convert-result-display"></div>
+        <div class="result-meta" id="convert-meta-display"></div>
+        <button id="convert-insert-btn" class="btn-secondary">Insert into Cell</button>
+      </div>
+      <div id="convert-error" class="error-msg hidden"></div>
+    </section>
+
+    <!-- ── Tab: Trend ── -->
+    <section id="tab-trend" class="tab-content">
+      <div class="form-group">
+        <label for="trend-currency">Currency</label>
+        <select id="trend-currency"></select>
+      </div>
+
+      <div class="two-col">
+        <div class="form-group">
+          <label for="trend-start">From</label>
+          <input type="date" id="trend-start" />
+        </div>
+        <div class="form-group">
+          <label for="trend-end">To</label>
+          <input type="date" id="trend-end" />
+        </div>
+      </div>
+
+      <button id="trend-btn" class="btn-primary">Load Trend</button>
+
+      <div id="trend-summary" class="trend-summary hidden">
+        <div class="trend-stat">
+          <span class="trend-label">High</span>
+          <span class="trend-value" id="trend-high"></span>
+        </div>
+        <div class="trend-stat">
+          <span class="trend-label">Low</span>
+          <span class="trend-value" id="trend-low"></span>
+        </div>
+        <div class="trend-stat">
+          <span class="trend-label">Avg</span>
+          <span class="trend-value" id="trend-avg"></span>
+        </div>
+        <div class="trend-stat">
+          <span class="trend-label">Change</span>
+          <span class="trend-value" id="trend-change"></span>
+        </div>
+      </div>
+
+      <canvas id="trend-chart" class="hidden"></canvas>
+
+      <button id="trend-export-btn" class="btn-secondary hidden">Export to Sheet</button>
+      <div id="trend-error" class="error-msg hidden"></div>
+    </section>
+
+    <!-- ── Tab: Formulas ── -->
+    <section id="tab-formulas" class="tab-content">
+      <p class="formula-intro">Use these custom functions directly in your spreadsheet cells.</p>
+
+      <div class="formula-card">
+        <div class="formula-name">BOC.RATE</div>
+        <div class="formula-sig">=BOC.RATE(currency, [date])</div>
+        <div class="formula-desc">Daily rate — latest or on a specific date.</div>
+        <div class="formula-examples">
+          <div>=BOC.RATE("USD")</div>
+          <div>=BOC.RATE("EUR", "2024-03-31")</div>
+        </div>
+      </div>
+
+      <div class="formula-card">
+        <div class="formula-name">BOC.MONTHLY_AVG</div>
+        <div class="formula-sig">=BOC.MONTHLY_AVG(currency, year, month)</div>
+        <div class="formula-desc">Monthly average rate published by BOC.</div>
+        <div class="formula-examples">
+          <div>=BOC.MONTHLY_AVG("USD", 2024, 3)</div>
+        </div>
+      </div>
+
+      <div class="formula-card">
+        <div class="formula-name">BOC.ANNUAL_AVG</div>
+        <div class="formula-sig">=BOC.ANNUAL_AVG(currency, year)</div>
+        <div class="formula-desc">Annual average rate for a full year.</div>
+        <div class="formula-examples">
+          <div>=BOC.ANNUAL_AVG("USD", 2023)</div>
+        </div>
+      </div>
+
+      <div class="formula-card">
+        <div class="formula-name">BOC.TO_CAD</div>
+        <div class="formula-sig">=BOC.TO_CAD(amount, currency, [date])</div>
+        <div class="formula-desc">Convert foreign currency amount to CAD.</div>
+        <div class="formula-examples">
+          <div>=BOC.TO_CAD(5000, "USD", "2024-12-31")</div>
+        </div>
+      </div>
+
+      <div class="formula-card">
+        <div class="formula-name">BOC.FROM_CAD</div>
+        <div class="formula-sig">=BOC.FROM_CAD(amount, currency, [date])</div>
+        <div class="formula-desc">Convert CAD amount to a foreign currency.</div>
+        <div class="formula-examples">
+          <div>=BOC.FROM_CAD(10000, "EUR")</div>
+        </div>
+      </div>
+
+      <div class="formula-card">
+        <div class="formula-name">BOC.RATE_DATE</div>
+        <div class="formula-sig">=BOC.RATE_DATE(currency, [date])</div>
+        <div class="formula-desc">Returns the actual date of the rate used (helpful for weekend/holiday dates).</div>
+        <div class="formula-examples">
+          <div>=BOC.RATE_DATE("USD", "2024-12-28")</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+  </div>
+</body>
+</html>
