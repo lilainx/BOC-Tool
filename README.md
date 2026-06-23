@@ -42,15 +42,26 @@ cd "BOC Tool"
 npm install
 ```
 
-### Run locally (with Excel sideloading)
+### Run locally (development only)
 
 ```bash
 npm start
 ```
 
-This will:
-1. Start the dev server at `https://localhost:3000`
-2. Sideload the manifest into Excel automatically
+This starts a dev server at `https://localhost:3000` and sideloads the add-in.
+**The add-in only works while this server is running** — that is expected for
+local development.
+
+### Run without a local server (free — GitHub Pages)
+
+1. Push to GitHub and enable **Settings → Pages → Source: GitHub Actions**
+2. After the workflow deploys:
+   ```bash
+   npm run make:github-manifest
+   ```
+3. In Excel: **Insert → Add-ins → Upload My Add-in** → select `manifest.prod.xml`
+
+Full details in **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
 
 ### Build for production
 
@@ -87,11 +98,8 @@ BOC Tool/
 
 ## Deployment
 
-For organisation-wide deployment via Microsoft 365 Admin Center:
-1. Build: `npm run build`
-2. Upload `manifest.xml` and host the `dist/` folder on a static web server (or Azure Static Web Apps)
-3. Update all `localhost:3000` URLs in `manifest.xml` to your production domain
-4. Deploy via **Microsoft 365 Admin Center → Settings → Integrated Apps**
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for full instructions (GitHub Pages,
+Cloudflare, Azure, desktop sideloading, and org-wide M365 Admin Center deploy).
 
 ---
 

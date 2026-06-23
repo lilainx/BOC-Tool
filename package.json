@@ -11,6 +11,7 @@
     "dev:certs": "office-addin-dev-certs install",
     "dev:server": "webpack serve --mode development",
     "make:prod-manifest": "node scripts/make-prod-manifest.js",
+    "make:github-manifest": "node scripts/make-prod-manifest.js https://lilainx.github.io/BOC-Tool",
     "validate": "office-addin-manifest validate manifest.xml"
   },
   "dependencies": {

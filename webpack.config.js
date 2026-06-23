@@ -46,8 +46,10 @@ module.exports = async (env, options) => {
       }),
       new CopyWebpackPlugin({
         patterns: [
+          // CORS headers for static hosts that support _headers (Cloudflare Pages, Netlify)
+          { from: "assets/_headers", to: "." },
           // icons → dist/assets/
-          { from: "assets", to: "assets" },
+          { from: "assets", to: "assets", globOptions: { ignore: ["**/_headers"] } },
           // custom functions metadata → dist/ (manifest references /functions.json)
           { from: "assets/functions.json", to: "functions.json" },
           // custom functions runtime HTML shim → dist/

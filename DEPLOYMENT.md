@@ -1,16 +1,83 @@
 # Deployment Guide
 
-This takes the add-in from "runs on my laptop via `npm run dev:server`" to
-"hosted on a real URL and available to the whole accounting team."
+This takes the add-in from "runs on my laptop via `npm start`" to
+"hosted on a real URL and available to the whole accounting team — **no local
+dev server required**."
+
+## Recommended: GitHub Pages (100% free)
+
+Your repo already includes a GitHub Actions workflow that builds and deploys the
+add-in for free. No credit card, no server to maintain.
+
+### One-time setup (~2 minutes)
+
+1. **Push this repo to GitHub** (if you haven't already).
+2. On GitHub, open the repo → **Settings → Pages**.
+3. Under **Build and deployment → Source**, choose **GitHub Actions**.
+4. Go to **Actions** → run **Deploy add-in to GitHub Pages** (or push to `main`).
+5. When it finishes, your add-in lives at:
+   **`https://lilainx.github.io/BOC-Tool/`**
+
+### Generate the production manifest
+
+```bash
+npm run make:github-manifest
+```
+
+This writes `manifest.prod.xml` pointed at your GitHub Pages URL. Validate it:
+
+```bash
+npx office-addin-manifest validate manifest.prod.xml
+```
+
+### Install in Excel (desktop or web — no local server)
+
+1. In Excel: **Insert → Add-ins → My Add-ins → Upload My Add-in**
+2. Select `manifest.prod.xml` → **Upload**
+3. Done. The add-in loads from GitHub Pages forever — nothing runs on your laptop.
+
+Every push to `main` auto-redeploys the latest code. Users get updates next time
+they open Excel (no re-sideloading needed unless the manifest itself changes).
+
+---
+
+## Other free options
+
+| Host | Cost | Best for |
+|---|---|---|
+| **GitHub Pages** | Free | Already set up in this repo |
+| **Cloudflare Pages** | Free | Private company repos, custom domain |
+| **Netlify** | Free tier | Alternative static host |
+
+See below for Cloudflare / Azure if you prefer those over GitHub Pages.
+
+---
+
+## Desktop Excel vs Excel on the web
+
+The same add-in works on **both**:
+
+| Platform | Supported? | Notes |
+|---|---|---|
+| Excel on the web | Yes | What you tested during dev sideloading |
+| Excel desktop (Windows) | Yes | Microsoft 365 subscription required for custom functions |
+| Excel desktop (Mac) | Yes | Same requirement |
+
+During development, `npm start` serves files from `https://localhost:3000`.
+That is why the add-in stops working when you close the terminal — Excel is
+still pointing at your laptop. Once you host the files on a permanent HTTPS URL
+and sideload/distribute a production manifest, **nothing needs to run locally**.
+
+The manifest already includes a `DesktopFormFactor` (ribbon button on the Home
+tab) and `AllFormFactors` custom functions, so desktop and web use the same build.
+
+---
 
 There are two distinct jobs:
 
 1. **Hosting** — put the built files (`dist/`) on an always-on HTTPS URL.
-2. **Distribution** — make the add-in appear for your team via the Microsoft 365 Admin Center.
-
-Hosting is something you (or whoever set up the project) can do. Distribution
-usually requires a **Microsoft 365 / Global or Exchange admin** — likely your IT
-team. Loop them in early.
+2. **Distribution** — sideload the production manifest (one user) or deploy via
+   the Microsoft 365 Admin Center (whole team).
 
 ---
 
@@ -19,7 +86,23 @@ team. Loop them in early.
 The add-in is a static site (HTML/JS/CSS) plus a JSON manifest, so any static
 HTTPS host works.
 
-### Option A — Cloudflare Pages (recommended: free, private repos OK)
+### Option A — GitHub Pages (easiest if the repo is already on GitHub)
+
+This repo includes a GitHub Actions workflow (`.github/workflows/deploy-pages.yml`)
+that builds and deploys `dist/` on every push to `main`.
+
+1. On GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Push to `main` (or run the workflow manually under **Actions**).
+3. Your URL will be `https://<username>.github.io/BOC-Tool/` (project site).
+
+Then generate the production manifest:
+
+```bash
+npm run make:prod-manifest https://<username>.github.io/BOC-Tool
+npx office-addin-manifest validate manifest.prod.xml
+```
+
+### Option B — Cloudflare Pages (recommended for private company repos)
 
 Free, works with **private** GitHub repos, and serves from the root domain (no
 sub-path), which keeps the manifest simple. Cloudflare builds the project itself
@@ -42,7 +125,7 @@ Cloudflare account (sign up at https://dash.cloudflare.com — no card required)
 > No public/private worry here — Cloudflare Pages is free either way, so keep the
 > repo private if that's your preference for company code.
 
-### Option B — Azure Static Web Apps
+### Option C — Azure Static Web Apps
 
 Prereqs: an Azure account (GeoComply almost certainly has one — ask IT), and
 this project pushed to a GitHub repo.
@@ -56,7 +139,7 @@ this project pushed to a GitHub repo.
    (or attach a custom domain).
 4. Every push to the repo redeploys automatically.
 
-### Option B — Any static host
+### Option D — Any static host
 
 Run `npm run build` and upload the contents of `dist/` to your host
 (Netlify, Cloudflare Pages, an internal IIS/nginx server, etc.). The only
@@ -90,16 +173,31 @@ npx office-addin-manifest validate manifest.prod.xml
 ### Just one (or a few) users — no admin needed
 
 For a single accountant, skip the M365 Admin Center entirely. That person
-sideloads the production manifest themselves, exactly like during development:
+sideloads the production manifest themselves:
 
-1. Send them `manifest.prod.xml` (the one pointing at your hosted URL).
-2. They open **Excel on the web** → **Insert → Add-ins → Upload My Add-in** →
-   browse to `manifest.prod.xml` → **Upload**.
+1. Send them `manifest.prod.xml` (the one pointing at your hosted URL, **not**
+   the dev `manifest.xml` with localhost).
+2. They sideload it in Excel:
+
+   **Excel desktop (Windows or Mac)**
+   - **Insert → Add-ins → My Add-ins**
+   - **Upload My Add-in** (bottom of the panel) → browse to `manifest.prod.xml`
+     → **Upload**
+   - The **BOC Exchange Rates** button appears on the **Home** tab.
+
+   **Excel on the web**
+   - **Insert → Add-ins → Upload My Add-in** → browse to `manifest.prod.xml`
+     → **Upload**
+
 3. Because the files are hosted (not on localhost), it keeps working with no dev
    server and nothing running on anyone's machine.
 
 That's the fastest way to get your first user going. Move to org distribution
 below once you want it to appear automatically for the whole team.
+
+> **Custom functions on desktop** require a **Microsoft 365** subscription
+> (Excel build 16.0.11629+). The task pane works on older perpetual licenses,
+> but `=BOC.RATE(...)` formulas need M365.
 
 ### Whole team — via M365 admin
 
